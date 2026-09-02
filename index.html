@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apostila AC1 — Componentes, Estados &amp; JS Avançado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2EFE4;
+  --paper-raised:#FBF9F2;
+  --ink:#1E2420;
+  --ink-soft:#54594F;
+  --ink-faint:#8A8F82;
+  --line:#D8D2BE;
+  --react-blue:#2C6E9E;
+  --react-blue-soft:#E4EEF3;
+  --js-amber:#C77A26;
+  --js-amber-soft:#F5E9D6;
+  --good:#3E7A52;
+  --bad:#B14A3A;
+  --code-bg:#20261F;
+  --code-text:#E9E6D8;
+  --code-accent:#E8B25E;
+  --radius-s:4px;
+  --radius-m:10px;
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);line-height:1.6;font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--js-amber-soft);color:var(--ink)}
+a{color:var(--react-blue)}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:600;color:var(--ink);line-height:1.15;margin:0}
+p{margin:0 0 .9em 0;color:var(--ink-soft)}
+code,pre{font-family:var(--mono)}
+.container{max-width:1240px;margin:0 auto;padding:0 28px}
+
+/* ===== TOP BAR ===== */
+.topbar{
+  position:sticky;top:0;z-index:50;background:rgba(242,239,228,.92);
+  backdrop-filter:blur(6px);border-bottom:1px solid var(--line);
+}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1240px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand .mark{font-family:var(--serif);font-weight:700;font-size:1.15rem}
+.brand .tag{font-size:.78rem;color:var(--ink-faint)}
+.topbar nav{display:flex;gap:18px}
+.topbar nav a{color:var(--ink-soft);text-decoration:none;font-size:.88rem;font-weight:500}
+.topbar nav a:hover{color:var(--react-blue)}
+.menu-toggle{display:none;background:none;border:1px solid var(--line);border-radius:var(--radius-s);padding:7px 10px;font-family:var(--sans);cursor:pointer}
+
+/* ===== LAYOUT ===== */
+.shell{display:grid;grid-template-columns:250px 1fr;gap:44px;max-width:1240px;margin:0 auto;padding:36px 28px 90px}
+.sidebar{position:sticky;top:70px;align-self:start;max-height:calc(100vh - 90px);overflow-y:auto;padding-right:6px}
+.side-group{margin-bottom:22px}
+.side-group h4{font-size:.72rem;letter-spacing:.02em;color:var(--ink-faint);font-family:var(--sans);font-weight:600;margin-bottom:8px}
+.side-group ul{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
+.side-group li a{
+  display:block;padding:5px 0 5px 12px;margin-left:-2px;border-left:2px solid transparent;
+  color:var(--ink-soft);text-decoration:none;font-size:.86rem;
+}
+.side-group li a:hover{color:var(--ink);border-left-color:var(--js-amber)}
+.side-group.g1 ul{border-left-color:var(--react-blue)}
+.side-group.g2 ul{border-left-color:var(--js-amber)}
+main{min-width:0}
+
+/* ===== HERO ===== */
+.hero{padding:8px 0 40px;border-bottom:1px solid var(--line);margin-bottom:44px}
+.hero .kicker{font-size:.85rem;color:var(--react-blue);font-weight:600;margin-bottom:10px}
+.hero h1{font-size:2.6rem;letter-spacing:-.01em;max-width:15ch}
+.hero .lead{margin-top:16px;font-size:1.08rem;max-width:56ch}
+.hero-meta{display:flex;gap:28px;margin-top:26px;flex-wrap:wrap}
+.hero-meta div{border-left:2px solid var(--js-amber);padding-left:12px}
+.hero-meta strong{display:block;font-family:var(--serif);font-size:1.3rem}
+.hero-meta span{font-size:.8rem;color:var(--ink-faint)}
+
+.focus-box{background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius-m);padding:24px 26px;margin:28px 0 0}
+.focus-box h3{font-size:1.05rem;margin-bottom:10px}
+.focus-box ul{margin:0;padding-left:1.15em;color:var(--ink-soft);font-size:.95rem}
+.focus-box li{margin-bottom:4px}
+.focus-box li b{color:var(--ink)}
+
+/* ===== MIND MAP ===== */
+.mindmap-section{margin-bottom:60px}
+.mm-wrap{position:relative;background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius-m);padding:44px 24px 34px;overflow:hidden}
+.mm-lines{position:absolute;inset:0;width:100%;height:100%}
+.mm-hub{display:flex;justify-content:center;margin-bottom:38px;position:relative;z-index:2}
+.mm-hub-node{
+  background:var(--ink);color:var(--paper);font-family:var(--serif);font-weight:600;
+  padding:14px 28px;border-radius:999px;font-size:1.05rem;text-align:center;
+}
+.mm-branches{display:flex;gap:36px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+.mm-branch{flex:1;min-width:300px;max-width:560px}
+.mm-branch-title{
+  text-align:center;font-weight:700;font-family:var(--serif);font-size:1.02rem;
+  padding:10px 18px;border-radius:999px;margin:0 auto 22px;display:table;
+}
+.mm-branch.a .mm-branch-title{background:var(--react-blue-soft);color:var(--react-blue);border:1px solid var(--react-blue)}
+.mm-branch.b .mm-branch-title{background:var(--js-amber-soft);color:var(--js-amber);border:1px solid var(--js-amber)}
+.mm-topics{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.mm-topic{
+  background:#fff;border:1px solid var(--line);border-radius:var(--radius-s);
+  padding:10px 13px;width:158px;font-size:.78rem;
+}
+.mm-topic strong{display:block;font-family:var(--sans);font-size:.82rem;margin-bottom:3px;color:var(--ink)}
+.mm-topic span{color:var(--ink-faint);font-size:.74rem;line-height:1.4}
+.mm-branch.a .mm-topic{border-top:3px solid var(--react-blue)}
+.mm-branch.b .mm-topic{border-top:3px solid var(--js-amber)}
+
+/* ===== TOPIC SECTIONS ===== */
+.topic{padding:52px 0;border-bottom:1px solid var(--line);scroll-margin-top:90px}
+.topic:last-of-type{border-bottom:none}
+.topic-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+.topic-eyebrow{font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:999px;letter-spacing:.01em}
+.topic.guide-a .topic-eyebrow{background:var(--react-blue-soft);color:var(--react-blue)}
+.topic.guide-b .topic-eyebrow{background:var(--js-amber-soft);color:var(--js-amber)}
+.topic h2{font-size:1.7rem;margin-bottom:14px}
+.topic .intro{font-size:1.02rem;max-width:70ch}
+.topic h3{font-size:1.12rem;margin:26px 0 10px}
+.topic p{max-width:72ch}
+.topic ul,.topic ol{max-width:72ch;color:var(--ink-soft)}
+.topic li{margin-bottom:5px}
+
+pre{
+  background:var(--code-bg);color:var(--code-text);border-radius:var(--radius-m);
+  padding:18px 20px;overflow-x:auto;font-size:.86rem;line-height:1.55;margin:14px 0 18px;
+  border:1px solid #2c3329;
+}
+pre code{color:var(--code-text)}
+.inline-code{background:var(--js-amber-soft);color:#7A4C16;padding:1px 6px;border-radius:4px;font-size:.86em}
+
+.callout{border-left:3px solid var(--js-amber);background:var(--js-amber-soft);border-radius:0 var(--radius-s) var(--radius-s) 0;padding:12px 16px;margin:16px 0;max-width:72ch}
+.callout p{margin:0;color:#5c3d10;font-size:.92rem}
+.callout.good{border-color:var(--good);background:#E4F1E7}
+.callout.good p{color:#254E33}
+.callout.bad{border-color:var(--bad);background:#F6E5E1}
+.callout.bad p{color:#6E2D20}
+
+.summary{
+  background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius-m);
+  padding:16px 20px;margin-top:22px;max-width:72ch;
+}
+.summary b{font-family:var(--serif);color:var(--react-blue);font-size:.82rem;letter-spacing:.02em}
+.summary p{margin:6px 0 0;font-size:.92rem}
+
+table{border-collapse:collapse;width:100%;max-width:72ch;margin:14px 0 18px;font-size:.87rem}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--paper-raised);font-weight:600;color:var(--ink)}
+td{color:var(--ink-soft)}
+
+/* ===== QUIZ ===== */
+.quiz-section{padding-top:52px}
+.quiz-head{margin-bottom:20px}
+.quiz-head h2{font-size:1.9rem}
+.quiz-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  position:sticky;top:64px;z-index:30;background:var(--paper);padding:12px 0;border-bottom:1px solid var(--line);margin-bottom:26px;
+}
+.progress-wrap{flex:1;min-width:180px}
+.progress-bar{height:6px;background:var(--line);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:var(--react-blue);width:0%;transition:width .25s}
+.progress-label{font-size:.78rem;color:var(--ink-faint);margin-top:5px}
+.quiz-actions{display:flex;gap:10px}
+.btn{
+  font-family:var(--sans);font-weight:600;font-size:.85rem;border-radius:999px;padding:9px 18px;
+  border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;
+}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:hover{opacity:.88}
+.score-pill{font-family:var(--serif);font-weight:600;font-size:.95rem;background:var(--paper-raised);border:1px solid var(--line);padding:8px 16px;border-radius:999px;display:none}
+.score-pill.show{display:inline-block}
+
+.qcard{background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius-m);padding:22px 24px;margin-bottom:16px}
+.qcard .qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.qcard .qnum{font-family:var(--mono);font-size:.78rem;color:var(--ink-faint)}
+.qcard .qtopic{font-size:.72rem;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--react-blue-soft);color:var(--react-blue)}
+.qcard .qtext{font-size:1.02rem;font-weight:500;margin-bottom:14px;color:var(--ink)}
+.options{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.option{
+  display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:var(--radius-s);
+  padding:10px 13px;cursor:pointer;background:#fff;font-size:.92rem;color:var(--ink-soft);transition:border-color .15s;
+}
+.option:hover{border-color:var(--react-blue)}
+.option input{margin-top:3px}
+.qcard.answered .option{cursor:default;pointer-events:none}
+.qcard.answered .option:hover{border-color:var(--line)}
+.qcard.answered .option.correct{border-color:var(--good);background:#E4F1E7;color:#254E33;font-weight:500}
+.qcard.answered .option.wrong{border-color:var(--bad);background:#F6E5E1;color:#6E2D20}
+.explain{
+  display:none;margin-top:12px;padding:11px 14px;border-radius:var(--radius-s);
+  background:#fff;border-left:3px solid var(--react-blue);font-size:.87rem;color:var(--ink-soft);
+}
+.qcard.answered .explain{display:block}
+.verdict{font-weight:700;font-family:var(--serif);margin-right:4px}
+.verdict.ok{color:var(--good)}
+.verdict.no{color:var(--bad)}
+
+.results-banner{
+  display:none;text-align:center;padding:30px 20px;background:var(--ink);color:var(--paper);
+  border-radius:var(--radius-m);margin:26px 0;
+}
+.results-banner.show{display:block}
+.results-banner .big{font-family:var(--serif);font-size:2.4rem;font-weight:600}
+.results-banner p{color:#C9CDC3;max-width:50ch;margin:8px auto 0}
+
+footer{text-align:center;padding:34px 20px;color:var(--ink-faint);font-size:.82rem;border-top:1px solid var(--line)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{position:static;max-height:none;display:none}
+  .sidebar.open{display:block}
+  .menu-toggle{display:inline-block}
+  .topbar nav{display:none}
+  .hero h1{font-size:2rem}
+  .mm-branches{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="mark">Apostila AC1</span><span class="tag">FrontEnd Web · 3ADSA</span></div>
+    <nav>
+      <a href="#mapa">Mapa mental</a>
+      <a href="#g1">Componentes</a>
+      <a href="#g2">JS Avançado</a>
+      <a href="#quiz">Questões</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle">Índice</button>
+  </div>
+</div>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-group">
+      <h4>Visão geral</h4>
+      <ul><li><a href="#mapa">Mapa mental</a></li></ul>
+    </div>
+    <div class="side-group g1">
+      <h4>Guia 1 · Componentes</h4>
+      <ul>
+        <li><a href="#t1">Componentes e Props</a></li>
+        <li><a href="#t2">Children</a></li>
+        <li><a href="#t3">CSS Modularizado</a></li>
+        <li><a href="#t4">Ciclo de vida</a></li>
+        <li><a href="#t5">useState</a></li>
+      </ul>
+    </div>
+    <div class="side-group g2">
+      <h4>Guia 2 · JS Avançado</h4>
+      <ul>
+        <li><a href="#t6">Funções</a></li>
+        <li><a href="#t7">Callback</a></li>
+        <li><a href="#t8">Métodos de vetor</a></li>
+        <li><a href="#t9">Desestruturação</a></li>
+        <li><a href="#t10">Operador ternário</a></li>
+        <li><a href="#t11">Operadores lógicos</a></li>
+        <li><a href="#t12">Promises e fetch</a></li>
+        <li><a href="#t13">Eventos e inputs</a></li>
+        <li><a href="#t14">Fetch com POST</a></li>
+      </ul>
+    </div>
+    <div class="side-group">
+      <h4>Prática</h4>
+      <ul><li><a href="#quiz">50 questões</a></li></ul>
+    </div>
+  </aside>
+
+  <main>
+    <section class="hero">
+      <div class="kicker">3ADSA · Técnicas de Programação WEB FrontEnd 2026/2</div>
+      <h1>Componentes, Estado e JavaScript Avançado</h1>
+      <p class="lead">Apostila de revisão para a AC1, reunindo os dois guias indicados — <em>Componentes com Props, Children, Estados e CSS Modularizado</em> e <em>JS Avançado com React JS</em> — em um mapa mental e um simulado de 50 questões.</p>
+      <div class="hero-meta">
+        <div><strong>14</strong><span>tópicos revisados</span></div>
+        <div><strong>2</strong><span>guias oficiais</span></div>
+        <div><strong>50</strong><span>questões comentadas</span></div>
+      </div>
+      <div class="focus-box">
+        <h3>O que a recomendação de leitura pede para focar</h3>
+        <ul>
+          <li><b>JSX e Componentes</b></li>
+          <li><b>Props</b> — children e desestruturação de props (objetos e vetor)</li>
+          <li><b>Estados</b> — montagem e atualização de componentes</li>
+          <li><b>Operador ternário</b> para renderização condicional</li>
+          <li><b>Callback e Métodos de Vetor</b> — foco no <code class="inline-code">map</code> para iteração de listas</li>
+          <li><b>Promises</b> — fetch com async/await, funções, then/catch</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="mindmap-section" id="mapa">
+      <h2 style="font-size:1.7rem;margin-bottom:6px">Mapa mental</h2>
+      <p style="max-width:60ch">Os 14 conceitos organizados nos dois guias que caem na AC1.</p>
+      <div class="mm-wrap" id="mmWrap">
+        <svg class="mm-lines" id="mmLines"></svg>
+        <div class="mm-hub">
+          <div class="mm-hub-node" id="mmHub">React &amp; JS Avançado — AC1</div>
+        </div>
+        <div class="mm-branches">
+          <div class="mm-branch a">
+            <div class="mm-branch-title" id="mmBranchA">Guia 1 — Componentes</div>
+            <div class="mm-topics" id="mmTopicsA"></div>
+          </div>
+          <div class="mm-branch b">
+            <div class="mm-branch-title" id="mmBranchB">Guia 2 — JS Avançado</div>
+            <div class="mm-topics" id="mmTopicsB"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GUIA 1 ============ -->
+    <div id="g1"></div>
+
+    <section class="topic guide-a" id="t1">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 1</span></div>
+      <h2>1. Componentes e Props</h2>
+      <p class="intro">Um componente é uma função que retorna JSX. Assim como toda função aceita parâmetros, um componente aceita entradas — e essas entradas são as <strong>props</strong>.</p>
+
+      <h3>O problema do componente estático</h3>
+      <p>Sem props, o conteúdo do componente fica fixo. Para ter cartões diferentes seria preciso duplicar o componente inteiro — exatamente o que a programação tenta evitar.</p>
+      <pre><code>function Card() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Estudar JavaScript&lt;/h1&gt;
+      &lt;p&gt;Ler 10 páginas&lt;/p&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+
+      <h3>Props: o parâmetro do componente</h3>
+      <p>O componente recebe um objeto <span class="inline-code">props</span> com todos os atributos passados na tag. Cada atributo escrito na tag vira uma chave do objeto.</p>
+      <pre><code>function Card(props) {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{props.titulo}&lt;/h1&gt;
+      &lt;p&gt;{props.paragrafo}&lt;/p&gt;
+    &lt;/div&gt;
+  )
+}
+
+// quem usa:
+&lt;Card titulo="Estudar JavaScript" paragrafo="Ler 10 páginas" /&gt;</code></pre>
+
+      <h3>Desestruturando as props</h3>
+      <p>Em vez de repetir <span class="inline-code">props.titulo</span>, é possível abrir o objeto direto nos parâmetros:</p>
+      <pre><code>function Card({ titulo, paragrafo }) {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{titulo}&lt;/h1&gt;
+      &lt;p&gt;{paragrafo}&lt;/p&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+
+      <div class="callout bad"><p><strong>Regra de ouro:</strong> props são somente leitura. O componente usa, mas nunca altera — quem manda no valor é quem passou a prop. Escrever <span class="inline-code">titulo = "Outro"</span> dentro do componente não atualiza a tela e quebra a previsibilidade.</p></div>
+
+      <div class="summary"><b>RESUMO</b><p>Componente = função que retorna JSX. Props = parâmetros dessa função, um objeto acessado com <span class="inline-code">props.chave</span> ou por desestruturação. São somente leitura e tornam o componente reutilizável com dados diferentes.</p></div>
+    </section>
+
+    <section class="topic guide-a" id="t2">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 1</span></div>
+      <h2>2. Children</h2>
+      <p class="intro">Props resolvem dados nomeados. Mas existe conteúdo sem rótulo: o que fica <em>entre</em> as tags de abertura e fechamento. Para isso existe a prop mais especial do React: <span class="inline-code">children</span>.</p>
+
+      <h3>props.children</h3>
+      <p>Todo componente possui, dentro de props, uma chave especial <span class="inline-code">children</span>, que guarda tudo o que foi escrito entre a tag de abertura e a de fechamento. O componente decide onde encaixar esse conteúdo.</p>
+      <pre><code>function Caixa(props) {
+  return (
+    &lt;div className="caixa"&gt;
+      &lt;h3&gt;Aviso&lt;/h3&gt;
+      {props.children}
+    &lt;/div&gt;
+  )
+}
+
+&lt;Caixa&gt;
+  &lt;p&gt;Sua senha expira em 7 dias.&lt;/p&gt;
+&lt;/Caixa&gt;</code></pre>
+
+      <h3>Props + children juntos, e composição</h3>
+      <p>Props para dados nomeados (título, cor), children para o conteúdo aberto. É assim que se monta um app em blocos — um componente contendo outros componentes.</p>
+      <table>
+        <tr><th>Situação</th><th>Técnica</th><th>Por quê</th></tr>
+        <tr><td>Dado nomeado e único (título, preço)</td><td>Props</td><td>O componente sabe exatamente o que é cada valor</td></tr>
+        <tr><td>Conteúdo aberto, definido por quem usa</td><td>Children</td><td>Não existe limite para o que pode entrar</td></tr>
+        <tr><td>Incluir outros componentes dentro</td><td>Children</td><td>É a base da composição de interfaces</td></tr>
+      </table>
+
+      <div class="summary"><b>RESUMO</b><p><span class="inline-code">props.children</span> guarda o conteúdo escrito entre as tags do componente. Não é um recurso separado — é apenas mais uma prop, preenchida automaticamente pelo React.</p></div>
+    </section>
+
+    <section class="topic guide-a" id="t3">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 1</span></div>
+      <h2>3. CSS Modularizado</h2>
+      <p class="intro">CSS global (<span class="inline-code">index.css</span>) vale para o projeto inteiro — duas classes com o mesmo nome brigam entre si. O CSS Module dá a cada componente um estilo com escopo próprio.</p>
+
+      <h3>Nome.module.css</h3>
+      <pre><code>/* Card.module.css */
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+import styles from "./Card.module.css";
+
+function Card({ titulo, children }) {
+  return (
+    &lt;div className={styles.card}&gt;
+      &lt;h1&gt;{titulo}&lt;/h1&gt;
+      {children}
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <p>No build, o Vite embaralha os nomes das classes com um sufixo único por arquivo (ex: <span class="inline-code">Card_titulo_1a2b3c</span>) — por isso dois componentes podem repetir <span class="inline-code">.titulo</span> sem conflito.</p>
+
+      <table>
+        <tr><th>CSS Global (index.css)</th><th>CSS Module (Nome.module.css)</th></tr>
+        <tr><td>Vale para a página inteira</td><td>Vale só para quem importou</td></tr>
+        <tr><td>Nomes de classe podem colidir</td><td>Nomes são embaralhados no build</td></tr>
+        <tr><td>Ideal para reset, fontes, variáveis</td><td>Ideal para o estilo de cada componente</td></tr>
+      </table>
+
+      <div class="callout bad"><p><strong>Armadilha clássica:</strong> escrever <span class="inline-code">class="card"</span> no JSX. O React aceita, mas o navegador não aplica o estilo — use sempre <span class="inline-code">className</span>.</p></div>
+
+      <div class="summary"><b>RESUMO</b><p>CSS Module dá escopo local ao estilo: importe com <span class="inline-code">import styles from ...</span> e use <span class="inline-code">className={'{styles.classe}'}</span>. O global fica reservado ao que é do site inteiro.</p></div>
+    </section>
+
+    <section class="topic guide-a" id="t4">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 1</span></div>
+      <h2>4. Estado e Ciclo de Vida</h2>
+      <p class="intro">Uma variável comum não atualiza a tela quando muda — o React simplesmente não a observa. Para a interface reagir, é preciso de <strong>estado</strong>.</p>
+
+      <pre><code>function Contador() {
+  let contador = 0;
+  function incrementar() { contador++; }  // muda a variável...
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Contador: {contador}&lt;/h1&gt;   {/* ...mas a tela não sabe */}
+      &lt;button onClick={incrementar}&gt;+1&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <p>O clique altera a variável na memória, mas ninguém avisou o React. Para a tela mudar, a função do componente precisa rodar de novo, e isso só acontece quando o React decide que algo relevante mudou.</p>
+
+      <h3>O que o React faz quando o estado muda</h3>
+      <ol>
+        <li>Roda a função do componente de novo (re-renderiza);</li>
+        <li>Compara o novo resultado com o Virtual DOM;</li>
+        <li>Aplica no DOM real apenas a diferença mínima.</li>
+      </ol>
+
+      <h3>As três fases do ciclo de vida</h3>
+      <table>
+        <tr><th>Fase</th><th>Quando acontece</th><th>O que o React faz</th></tr>
+        <tr><td>Montagem</td><td>Componente aparece na tela pela 1ª vez</td><td>Roda a função, cria estados iniciais, insere o JSX no DOM</td></tr>
+        <tr><td>Atualização</td><td>Um estado muda ou novas props chegam</td><td>Roda a função de novo, compara e atualiza só o necessário</td></tr>
+        <tr><td>Desmontagem</td><td>Componente sai da tela</td><td>Remove o JSX do DOM e esquece os estados</td></tr>
+      </table>
+
+      <div class="summary"><b>RESUMO</b><p>Variável comum "reseta" a cada renderização, porque vive dentro da função. O estado é guardado pelo React fora da função e sobrevive entre renderizações — é a memória observada do componente.</p></div>
+    </section>
+
+    <section class="topic guide-a" id="t5">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 1</span></div>
+      <h2>5. Estado com useState</h2>
+      <p class="intro"><span class="inline-code">useState</span> é o hook que conecta o componente ao funcionamento interno do React, criando um dado observado.</p>
+
+      <pre><code>import { useState } from "react";
+
+function Contador() {
+  const [contador, setContador] = useState(0);
+  //     ^valor atual  ^função de atualizar   ^valor inicial
+
+  function incrementar() {
+    setContador(contador + 1)
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Contador: {contador}&lt;/h1&gt;
+      &lt;button onClick={incrementar}&gt;+1&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <p><span class="inline-code">useState(0)</span> devolve um array de duas posições, e a desestruturação de vetor "abre" esse array:</p>
+      <table>
+        <tr><th>Posição</th><th>Nome usual</th><th>Função</th></tr>
+        <tr><td>0</td><td>contador</td><td>Ler / exibir o valor atual</td></tr>
+        <tr><td>1</td><td>setContador</td><td>Atualizar o valor e disparar a re-renderização</td></tr>
+      </table>
+
+      <div class="callout"><p><strong>Regras dos hooks:</strong> só dentro de componentes; sempre no topo da função (nunca em <span class="inline-code">if</span>, <span class="inline-code">for</span> ou dentro de <span class="inline-code">return</span>); sempre na mesma ordem em toda renderização.</p></div>
+      <div class="callout bad"><p>Evite <span class="inline-code">setContador(contador++)</span> — o <span class="inline-code">++</span> devolve o valor antigo. Calcule sempre fora: <span class="inline-code">setContador(contador + 1)</span>.</p></div>
+
+      <div class="summary"><b>RESUMO</b><p><span class="inline-code">useState(inicial)</span> devolve <span class="inline-code">[valor, setValor]</span>. A função <span class="inline-code">set</span> atualiza o estado e avisa o React, que re-renderiza o componente.</p></div>
+    </section>
+
+    <!-- ============ GUIA 2 ============ -->
+    <div id="g2"></div>
+
+    <section class="topic guide-b" id="t6">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 2</span></div>
+      <h2>6. Funções: tipos, parâmetros e retorno</h2>
+      <p class="intro">Todo componente React é uma função que recebe props e retorna JSX — dominar as formas de escrever função é pré-requisito direto.</p>
+
+      <pre><code>// 1) Declaração — pode ser chamada antes de aparecer no arquivo
+function dobrar(n) { return n * 2; }
+
+// 2) Expressão — a função vira um valor guardado numa variável
+const triplicar = function (n) { return n * 3; };
+
+// 3) Arrow function — padrão em código moderno e no React
+const quadruplicar = (n) => { return n * 4; };
+
+// retorno implícito: sem chaves, a expressão JÁ é o retorno
+const somarCurta = (a, b) => a + b;
+
+// 4) Função assíncrona
+async function buscarUsuario() {
+  const resposta = await fetch("https://api.exemplo.com/usuario");
+  return await resposta.json();
+}</code></pre>
+
+      <table>
+        <tr><th>Tipo</th><th>Sintaxe</th><th>Observação</th></tr>
+        <tr><td>Declaração</td><td><span class="inline-code">function nome(){}</span></td><td>Aceita hoisting</td></tr>
+        <tr><td>Expressão</td><td><span class="inline-code">const n = function(){}</span></td><td>Só existe após a atribuição</td></tr>
+        <tr><td>Arrow</td><td><span class="inline-code">const n = () =&gt; {}</span></td><td>Mais curta; padrão em eventos JSX</td></tr>
+      </table>
+
+      <div class="callout bad"><p>Arrow function com chaves <strong>não</strong> retorna nada automaticamente: <span class="inline-code">(a,b) =&gt; { a + b }</span> devolve <span class="inline-code">undefined</span>. Retorno implícito só vale sem chaves.</p></div>
+
+      <div class="summary"><b>RESUMO</b><p>Quatro tipos de função: declaração, expressão, arrow (com retorno implícito sem chaves) e async (com <span class="inline-code">await</span>, sempre devolvendo uma Promise).</p></div>
+    </section>
+
+    <section class="topic guide-b" id="t7">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 2</span></div>
+      <h2>7. Callback</h2>
+      <p class="intro">Função é um valor: pode ser guardada, passada como argumento e executada por outra função. Uma função entregue a outra para ser chamada depois é um <strong>callback</strong>.</p>
+
+      <pre><code>function avisar() { console.log("Nova mensagem!"); }
+
+avisar;   // apenas a referência, nada acontece
+avisar(); // executa AGORA
+
+function processarPedido(cliente, acao) {
+  console.log(`Processando pedido de ${cliente}...`);
+  acao(); // chamando de volta
+}
+processarPedido("Ana", () =&gt; console.log("Enviando e-mail"));</code></pre>
+
+      <h3>Callback nos eventos do React</h3>
+      <table>
+        <tr><th>Escrita</th><th>O que acontece</th></tr>
+        <tr><td><span class="inline-code">onClick={'{avisar}'}</span></td><td>Executa quando o usuário clicar — <b>correto</b></td></tr>
+        <tr><td><span class="inline-code">onClick={'{() => avisar("oi")}'}</span></td><td>Executa no clique, com argumento — <b>correto</b></td></tr>
+        <tr><td><span class="inline-code">onClick={'{avisar()}'}</span></td><td>Executa imediatamente ao renderizar — <b>erro clássico</b></td></tr>
+      </table>
+
+      <div class="summary"><b>RESUMO</b><p>Com parênteses você executa na hora (<span class="inline-code">avisar()</span>); sem parênteses você entrega a referência (<span class="inline-code">avisar</span>). Argumentos exigem uma arrow function envolvendo a chamada.</p></div>
+    </section>
+
+    <section class="topic guide-b" id="t8">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 2</span></div>
+      <h2>8. Métodos de iteração de vetor</h2>
+      <p class="intro">forEach, map, filter e reduce recebem um callback executado item a item — quem controla o percurso é o método; você entrega apenas o comportamento.</p>
+
+      <pre><code>const produtos = [
+  { nome: "Teclado", preco: 150 },
+  { nome: "Mouse", preco: 80 },
+  { nome: "Monitor", preco: 900 }
+];
+
+// map: transforma cada item, devolve vetor do MESMO tamanho
+const etiquetas = produtos.map(p =&gt; `${p.nome} - R$ ${p.preco}`);
+
+// filter: seleciona itens, devolve vetor igual ou MENOR
+const caros = produtos.filter(p =&gt; p.preco &gt; 100);
+
+// reduce: acumula tudo em um único valor
+const total = produtos.reduce((acc, item) =&gt; acc + item.preco, 0);</code></pre>
+
+      <table>
+        <tr><th>Método</th><th>Callback devolve</th><th>Retorno do método</th><th>No lugar de qual for?</th></tr>
+        <tr><td>forEach</td><td>Nada (só efeito)</td><td>undefined</td><td>Loop simples, sem contador</td></tr>
+        <tr><td>map</td><td>Item transformado</td><td>Novo vetor (mesmo tamanho)</td><td>for + vetor auxiliar + push</td></tr>
+        <tr><td>filter</td><td>true / false</td><td>Novo vetor (igual ou menor)</td><td>for + if + push</td></tr>
+        <tr><td>reduce</td><td>O acumulado até ali</td><td>Um único valor</td><td>for + variável acumuladora</td></tr>
+      </table>
+
+      <h3>No React: listas com map + key</h3>
+      <pre><code>&lt;ul&gt;
+  {produtos.map((produto) =&gt; (
+    &lt;li key={produto.nome}&gt;
+      {produto.nome} - R$ {produto.preco}
+    &lt;/li&gt;
+  ))}
+&lt;/ul&gt;</code></pre>
+      <p>É porque o <span class="inline-code">map</span> devolve um vetor que ele entra direto no JSX — com <span class="inline-code">forEach</span> não funcionaria, pois devolve <span class="inline-code">undefined</span>. A prop <span class="inline-code">key</span> deve ser um valor único e estável (id, nome), nunca o índice.</p>
+
+      <div class="summary"><b>RESUMO</b><p>map, filter e reduce nunca alteram o vetor original — produzem um resultado novo. Só o map alimenta listas no JSX, sempre acompanhado de <span class="inline-code">key</span>.</p></div>
+    </section>
+
+    <section class="topic guide-b" id="t9">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 2</span></div>
+      <h2>9. Desestruturação: objetos e vetores</h2>
+      <p class="intro">Desestruturar é "abrir" um objeto ou vetor e extrair valores direto para variáveis, em uma linha só. Aparece no <span class="inline-code">useState</span> e na leitura de props.</p>
+
+      <pre><code>// OBJETO — extração pelo NOME da propriedade
+const aluno = { nome: "Ana", curso: "2ADS" };
+const { nome, curso } = aluno;
+
+// renomear e valor padrão
+const { titulo: nomeProduto, desconto = 0 } = produto;
+
+// VETOR — extração pela POSIÇÃO
+const notas = [9.5, 7.0, 8.5];
+const [primeira, segunda] = notas;
+const [ , , terceira ] = notas; // pulando posições</code></pre>
+
+      <table>
+        <tr><th>Critério</th><th>Objeto { }</th><th>Vetor [ ]</th></tr>
+        <tr><td>Extração por</td><td>Nome da propriedade</td><td>Posição (índice)</td></tr>
+        <tr><td>Ordem importa?</td><td>Não</td><td>Sim</td></tr>
+        <tr><td>Exemplo no React</td><td>Props: <span class="inline-code">{'{ nome, preco }'}</span></td><td>useState: <span class="inline-code">[valor, setValor]</span></td></tr>
+      </table>
+
+      <div class="summary"><b>RESUMO</b><p>Chaves abrem objeto (por nome); colchetes abrem vetor (por posição). No React, props são objetos e o retorno do useState é vetor.</p></div>
+    </section>
+
+    <section class="topic guide-b" id="t10">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 2</span></div>
+      <h2>10. Operador ternário</h2>
+      <p class="intro">Forma compacta de decidir entre dois valores: <span class="inline-code">condição ? seTrue : seFalse</span>. É a ferramenta padrão de renderização condicional no React.</p>
+
+      <pre><code>const categoria = idade &gt;= 18 ? "adulto" : "menor";
+
+// dentro do JSX:
+{logado ? (
+  &lt;p&gt;Bem-vindo de volta!&lt;/p&gt;
+) : (
+  &lt;p&gt;Faça o login para continuar&lt;/p&gt;
+)}
+&lt;button&gt;{logado ? "Sair" : "Entrar"}&lt;/button&gt;</code></pre>
+
+      <table>
+        <tr><th>Critério</th><th>if / else</th><th>Ternário</th></tr>
+        <tr><td>O que é</td><td>Instrução (executa blocos)</td><td>Expressão (devolve um valor)</td></tr>
+        <tr><td>Funciona dentro do JSX?</td><td>Não</td><td>Sim — entre chaves { }</td></tr>
+      </table>
+
+      <div class="callout"><p>Ternários podem se encadear (<span class="inline-code">nota &gt;= 9 ? "A" : nota &gt;= 7 ? "B" : "C"</span>), mas acima de três caminhos considere voltar ao if/else para manter a leitura.</p></div>
+
+      <div class="summary"><b>RESUMO</b><p>O ternário devolve um valor, por isso funciona dentro das chaves do JSX para trocar textos, atributos ou componentes conforme o estado.</p></div>
+    </section>
+
+    <section class="topic guide-b" id="t11">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 2</span></div>
+      <h2>11. Operadores lógicos &amp;&amp; e ||</h2>
+      <p class="intro">Em JavaScript, <span class="inline-code">&amp;&amp;</span> e <span class="inline-code">||</span> devolvem um dos operandos (não apenas um booleano) e param assim que a resposta já está garantida — o curto-circuito.</p>
+
+      <table>
+        <tr><th>Valor</th><th>Classificação</th></tr>
+        <tr><td>false, 0, "", null, undefined, NaN</td><td>falsy</td></tr>
+        <tr><td>Qualquer outro (inclusive "0", [] e {'{}'})</td><td>truthy</td></tr>
+      </table>
+
+      <pre><code>// || devolve o primeiro TRUTHY
+const exibicao = nome || "Visitante";
+
+// && devolve o primeiro FALSY (ou o último)
+const mensagem = logado && "Bem-vindo!";
+
+// No JSX:
+{erros.length &gt; 0 && &lt;p&gt;Corrija os campos&lt;/p&gt;}
+&lt;h1&gt;Olá, {nome || "visitante"}!&lt;/h1&gt;</code></pre>
+
+      <div class="callout bad"><p>O <span class="inline-code">||</span> trata <span class="inline-code">0</span> como falsy: se <span class="inline-code">curtidas</span> valer 0, <span class="inline-code">{'{curtidas || "-"}'}</span> mostraria "-" indevidamente. Para números onde zero é válido, teste explicitamente.</p></div>
+
+      <div class="summary"><b>RESUMO</b><p><span class="inline-code">||</span> = primeiro truthy (valor padrão). <span class="inline-code">&amp;&amp;</span> = primeiro falsy, ou o último (renderização condicional no JSX).</p></div>
+    </section>
+
+    <section class="topic guide-b" id="t12">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 2</span></div>
+      <h2>12. Promises e fetch</h2>
+      <p class="intro">Uma Promise representa um valor que ainda vai chegar. O <span class="inline-code">fetch</span> faz pedidos HTTP e devolve uma Promise.</p>
+
+      <table>
+        <tr><th>Estado</th><th>Significado</th></tr>
+        <tr><td>pending</td><td>Em andamento, sem resultado ainda</td></tr>
+        <tr><td>fulfilled</td><td>Concluída com sucesso</td></tr>
+        <tr><td>rejected</td><td>Falhou (tem um erro)</td></tr>
+      </table>
+
+      <pre><code>// .then / .catch
+fetch("https://api.exemplo.com/usuarios")
+  .then((resposta) =&gt; resposta.json())
+  .then((dados) =&gt; console.log(dados))
+  .catch((erro) =&gt; console.log("Falhou:", erro));
+
+// async/await + try/catch
+async function carregarUsuarios() {
+  try {
+    const resposta = await fetch("https://api.exemplo.com/usuarios");
+    if (!resposta.ok) throw new Error(`Erro ${'${resposta.status}'}`);
+    const dados = await resposta.json();
+  } catch (erro) {
+    console.log("Falhou:", erro.message);
+  }
+}</code></pre>
+
+      <div class="callout bad"><p>Esquecer o <span class="inline-code">await</span> antes de <span class="inline-code">resposta.json()</span> deixa uma Promise pendente na mão, não os dados já convertidos.</p></div>
+
+      <div class="summary"><b>RESUMO</b><p>fetch dispara o pedido e devolve uma Promise. No React, espelhe os estados da Promise em estados do componente: <span class="inline-code">carregando</span>, <span class="inline-code">erro</span> e <span class="inline-code">dados</span>.</p></div>
+    </section>
+
+    <section class="topic guide-b" id="t13">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 2</span></div>
+      <h2>13. Eventos no React: campos de entrada</h2>
+      <p class="intro">O valor digitado não mora no HTML — mora no estado. O campo de entrada é só a ponte entre o teclado e esse estado.</p>
+
+      <pre><code>function Saudacao() {
+  const [nome, setNome] = useState("");
+  return (
+    &lt;div&gt;
+      &lt;input
+        value={nome}
+        onChange={(e) =&gt; setNome(e.target.value)}
+      /&gt;
+      &lt;h1&gt;Olá, {nome || "visitante"}!&lt;/h1&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <p>O acordo de um campo controlado tem três cláusulas: o estado guarda o texto (<span class="inline-code">value={'{nome}'}</span>); a cada tecla, <span class="inline-code">onChange</span> atualiza o estado; a re-renderização devolve o texto novo ao campo.</p>
+
+      <table>
+        <tr><th>Propriedade</th><th>O que é</th></tr>
+        <tr><td>e</td><td>O objeto do evento, entregue pelo React</td></tr>
+        <tr><td>e.target</td><td>O elemento do DOM que disparou o evento</td></tr>
+        <tr><td>e.target.value</td><td>O valor atual do campo</td></tr>
+      </table>
+
+      <div class="callout"><p><strong>Controlado × não controlado:</strong> sem <span class="inline-code">value</span> + estado, o input guarda o texto sozinho e o React fica fora do jogo.</p></div>
+
+      <div class="summary"><b>RESUMO</b><p>Padrão controlado: o estado guarda o texto, <span class="inline-code">onChange</span> captura cada tecla via <span class="inline-code">e.target.value</span>, e <span class="inline-code">value</span> devolve o texto ao campo.</p></div>
+    </section>
+
+    <section class="topic guide-b" id="t14">
+      <div class="topic-head"><span class="topic-eyebrow">Guia 2</span></div>
+      <h2>14. Enviando dados: fetch com POST</h2>
+      <p class="intro">Para um dado digitado sobreviver ao fechar a aba, ele precisa cruzar a rede até um servidor.</p>
+
+      <table>
+        <tr><th>Verbo</th><th>Objetivo</th><th>Onde os dados viajam</th></tr>
+        <tr><td>GET</td><td>Pedir dados</td><td>Na URL</td></tr>
+        <tr><td>POST</td><td>Enviar dados</td><td>No corpo da requisição</td></tr>
+      </table>
+
+      <pre><code>const resposta = await fetch("https://api.minhaloja.com/usuarios", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ nome: nome })
+});
+
+if (!resposta.ok) { setMensagem("Erro " + resposta.status); return; }
+const dados = await resposta.json();
+setMensagem(dados.mensagem);</code></pre>
+
+      <div class="callout"><p><strong>Por que JSON.stringify()?</strong> O corpo de uma requisição HTTP é sempre texto — um objeto JS não atravessa a rede sozinho. A etiqueta <span class="inline-code">Content-Type: application/json</span> precisa acompanhar.</p></div>
+      <div class="callout"><p><strong>Por que não &lt;form&gt;?</strong> Um formulário recarrega a página ao ser enviado. Um botão comum disparando por <span class="inline-code">onClick</span> mantém quem manda na página como o React.</p></div>
+
+      <div class="summary"><b>RESUMO</b><p>Ciclo completo: estado → texto JSON (<span class="inline-code">JSON.stringify</span>) → rede → servidor → resposta → <span class="inline-code">resposta.json()</span> → estado.</p></div>
+    </section>
+
+    <!-- ============ QUIZ ============ -->
+    <section class="quiz-section topic" id="quiz">
+      <div class="quiz-head">
+        <span class="topic-eyebrow" style="background:var(--ink);color:var(--paper)">Simulado</span>
+        <h2>50 questões de revisão</h2>
+        <p>Clique em uma alternativa para responder — o card mostra na hora se acertou, com uma explicação.</p>
+      </div>
+
+      <div class="quiz-toolbar">
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-label" id="progressLabel">0 de 50 respondidas</div>
+        </div>
+        <div class="quiz-actions">
+          <span class="score-pill" id="scorePill"></span>
+          <button class="btn ghost" id="resetBtn">Reiniciar</button>
+        </div>
+      </div>
+
+      <div class="results-banner" id="resultsBanner">
+        <div class="big" id="resultsBig"></div>
+        <p id="resultsText"></p>
+      </div>
+
+      <div id="quizList"></div>
+    </section>
+  </main>
+</div>
+
+<footer>Apostila gerada a partir do Guia de Componentes e do Guia de JS Avançado — SPTech, 3ADSA FrontEnd 2026/2.</footer>
+
+<script>
+/* ===================== MAPA MENTAL ===================== */
+const branchAData = [
+  {t:"Componentes e Props", d:"função → JSX, props como parâmetro"},
+  {t:"Children", d:"props.children, composição"},
+  {t:"CSS Modularizado", d:"Nome.module.css, className"},
+  {t:"Ciclo de vida", d:"montagem, atualização, desmontagem"},
+  {t:"useState", d:"[valor, setValor] = useState()"},
+];
+const branchBData = [
+  {t:"Funções", d:"declaração, expressão, arrow, async"},
+  {t:"Callback", d:"função passada como argumento"},
+  {t:"Métodos de vetor", d:"forEach, map, filter, reduce"},
+  {t:"Desestruturação", d:"objeto {} por nome, vetor [] por posição"},
+  {t:"Operador ternário", d:"condição ? true : false"},
+  {t:"Operadores lógicos", d:"&& e || com truthy/falsy"},
+  {t:"Promises e fetch", d:"pending, fulfilled, rejected"},
+  {t:"Eventos e inputs", d:"onChange, value, e.target"},
+  {t:"Fetch com POST", d:"JSON.stringify, headers, body"},
+];
+
+function fillTopics(containerId, data, parentId){
+  const el = document.getElementById(containerId);
+  data.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className = 'mm-topic';
+    div.dataset.parent = parentId;
+    div.id = containerId + i;
+    div.innerHTML = `<strong>${item.t}</strong><span>${item.d}</span>`;
+    el.appendChild(div);
+  });
+}
+fillTopics('mmTopicsA', branchAData, 'mmBranchA');
+fillTopics('mmTopicsB', branchBData, 'mmBranchB');
+
+function drawMindmapLines(){
+  const wrap = document.getElementById('mmWrap');
+  const svg = document.getElementById('mmLines');
+  const wrapRect = wrap.getBoundingClientRect();
+  svg.setAttribute('width', wrapRect.width);
+  svg.setAttribute('height', wrapRect.height);
+  svg.innerHTML = '';
+
+  function centerOf(el, edge){
+    const r = el.getBoundingClientRect();
+    const x = r.left - wrapRect.left + r.width/2;
+    const yTop = r.top - wrapRect.top;
+    const yBottom = r.bottom - wrapRect.top;
+    return edge === 'bottom' ? {x, y:yBottom} : {x, y:yTop};
+  }
+
+  function line(p1, p2, color){
+    const midY = p1.y + (p2.y - p1.y) * 0.5;
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    const d = `M ${p1.x} ${p1.y} C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
+    path.setAttribute('d', d);
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '1.5');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('opacity', '0.55');
+    svg.appendChild(path);
+  }
+
+  const hub = document.getElementById('mmHub');
+  const bA = document.getElementById('mmBranchA');
+  const bB = document.getElementById('mmBranchB');
+  line(centerOf(hub,'bottom'), centerOf(bA,'top'), '#2C6E9E');
+  line(centerOf(hub,'bottom'), centerOf(bB,'top'), '#C77A26');
+
+  document.querySelectorAll('[data-parent="mmBranchA"]').forEach(el=>{
+    line(centerOf(bA,'bottom'), centerOf(el,'top'), '#2C6E9E');
+  });
+  document.querySelectorAll('[data-parent="mmBranchB"]').forEach(el=>{
+    line(centerOf(bB,'bottom'), centerOf(el,'top'), '#C77A26');
+  });
+}
+window.addEventListener('load', drawMindmapLines);
+let resizeTimer;
+window.addEventListener('resize', ()=>{ clearTimeout(resizeTimer); resizeTimer = setTimeout(drawMindmapLines, 150); });
+
+/* ===================== MENU MOBILE ===================== */
+document.getElementById('menuToggle').addEventListener('click', ()=>{
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+/* ===================== QUIZ ===================== */
+const QUESTIONS = [
+{topic:"Props", q:"O que é uma prop no React?", opts:["Um método do DOM","O parâmetro do componente — um objeto com os dados recebidos","Um hook exclusivo do useState","Um arquivo CSS"], correct:1, explain:"Props funcionam como parâmetros de uma função: o componente recebe um objeto com os valores passados por quem o utiliza."},
+{topic:"Props", q:'Ao escrever <Card titulo="Estudar" />, como o Card acessa esse valor sem desestruturação?', opts:["props.titulo","this.titulo","Card.titulo","titulo()"], correct:0, explain:"Sem desestruturar, o componente recebe o objeto props inteiro e acessa a chave com props.titulo."},
+{topic:"Props", q:"Props podem ser alteradas diretamente dentro do componente que as recebe?", opts:["Sim, é a forma recomendada","Não, props são somente leitura","Apenas em componentes de classe","Apenas se usar useState junto"], correct:1, explain:"Props são somente leitura: quem manda no valor é quem passou a prop, nunca quem recebe."},
+{topic:"Props", q:"function Card({ titulo, paragrafo }) usa qual recurso da linguagem?", opts:["Spread operator","Desestruturação de objeto","Desestruturação de vetor","Rest parameters"], correct:1, explain:"As chaves { } nos parâmetros abrem o objeto props e extraem as chaves pelo nome — desestruturação de objeto."},
+{topic:"Props", q:"Qual a principal vantagem de usar props em vez de duplicar componentes?", opts:["Melhora a performance do CSS","Permite reaproveitar o mesmo componente com dados diferentes","Evita o uso de JSX","Substitui o useState"], correct:1, explain:"Com props, o mesmo componente vira variações diferentes sem copiar código."},
+{topic:"Children", q:"Para que serve props.children?", opts:["Armazenar o estado do componente","Guardar tudo o que é escrito entre a abertura e o fechamento da tag do componente","Listar os hooks usados","Definir o CSS do componente"], correct:1, explain:"children guarda o conteúdo colocado entre as tags de abertura e fechamento do componente."},
+{topic:"Children", q:"Em qual situação é melhor usar children em vez de uma prop nomeada?", opts:["Quando o valor é sempre um número","Quando o conteúdo é aberto e definido por quem usa o componente","Quando o dado vem de uma API","Quando é preciso validar o tipo do dado"], correct:1, explain:"Children serve para conteúdo aberto, sem um rótulo fixo — não dá para criar uma prop para cada possibilidade."},
+{topic:"Children", q:"children é tecnicamente:", opts:["Um hook separado das props","Apenas mais uma prop, preenchida automaticamente pelo React","Um atributo exclusivo de tags HTML","Uma função de callback"], correct:1, explain:"children não é um recurso separado das props — é apenas mais uma prop, com nome fixo, preenchida pelo React."},
+{topic:"Children", q:"A composição de componentes (um componente dentro do outro) é possível principalmente graças a:", opts:["CSS Modules","children","useState","fetch"], correct:1, explain:"É children que permite que um componente contenha outros componentes, formando blocos dentro de blocos."},
+{topic:"CSS Modules", q:"Qual a extensão de arquivo usada para CSS com escopo local?", opts:["Nome.css","Nome.module.css","Nome.scoped.css","Nome.local.css"], correct:1, explain:"A convenção Nome.module.css é o que ativa o CSS Module."},
+{topic:"CSS Modules", q:"O que o Vite faz com os nomes das classes de um CSS Module no build?", opts:["Remove todos os estilos não usados","Embaralha os nomes, adicionando um sufixo único por arquivo","Converte para inline style","Junta tudo em um único arquivo global"], correct:1, explain:"O nome final vira algo como Card_titulo_1a2b3c, evitando colisão entre componentes."},
+{topic:"CSS Modules", q:"No JSX, o atributo correto para aplicar uma classe é:", opts:["class","className","styleClass","cssClass"], correct:1, explain:"class é palavra reservada do JavaScript; o JSX usa className."},
+{topic:"CSS Modules", q:"Qual a principal diferença entre index.css e um CSS Module?", opts:["index.css não aceita cores","O CSS Module vale só para quem o importou; index.css vale para a página inteira","O CSS Module não pode ter seletores","index.css é mais rápido de carregar"], correct:1, explain:"index.css é global; o CSS Module tem escopo restrito a quem o importa."},
+{topic:"Estado", q:"Por que uma variável comum (let contador = 0) não atualiza a tela ao mudar?", opts:["Porque JavaScript não permite variáveis dentro de componentes","Porque o React não observa variáveis comuns, apenas o estado","Porque falta um console.log","Porque contador precisa ser const"], correct:1, explain:"O React só reage a mudanças de estado; uma variável comum é invisível para ele."},
+{topic:"Estado", q:"Quais são as três fases do ciclo de vida de um componente?", opts:["Criação, execução, destruição","Montagem, atualização, desmontagem","Início, meio, fim","Render, commit, paint"], correct:1, explain:"Montagem (nasce), atualização (estado/props mudam) e desmontagem (sai da tela)."},
+{topic:"Estado", q:'O que acontece na fase de "atualização" do ciclo de vida?', opts:["O componente é removido do DOM","Um estado muda ou novas props chegam, e o React roda a função de novo","O componente é criado pela primeira vez","O CSS é recarregado"], correct:1, explain:"Na atualização, o React roda a função de novo, compara o Virtual DOM e aplica só a diferença mínima."},
+{topic:"Estado", q:"O estado sobrevive entre renderizações porque:", opts:["É salvo no localStorage automaticamente","É guardado pelo React fora da função do componente","É uma variável global do JavaScript comum","É recalculado a cada clique do zero"], correct:1, explain:"Diferente de uma variável comum (que reseta a cada chamada da função), o estado é mantido pelo React fora da função."},
+{topic:"useState", q:"O que useState(0) retorna?", opts:["Um objeto com value e onChange","Um array com o valor atual e uma função para atualizá-lo","Apenas o valor inicial","Uma Promise"], correct:1, explain:"useState devolve sempre um array de 2 posições: [valor, setValor]."},
+{topic:"useState", q:"Na linha const [contador, setContador] = useState(0), qual recurso da linguagem está sendo usado?", opts:["Desestruturação de vetor","Desestruturação de objeto","Spread operator","Template string"], correct:0, explain:"useState devolve um vetor, então a extração usa colchetes — desestruturação de vetor, por posição."},
+{topic:"useState", q:"Qual a forma correta de atualizar o estado?", opts:["contador = contador + 1","setContador(contador + 1)","contador++ dentro do JSX","useState(contador + 1)"], correct:1, explain:"Só a função set atualiza o estado e avisa o React para re-renderizar."},
+{topic:"useState", q:"Onde os hooks como useState devem ser chamados?", opts:["Dentro de condicionais (if)","No topo da função do componente, sempre na mesma ordem","Dentro de loops for","Fora de qualquer componente"], correct:1, explain:"Regra dos hooks: sempre no topo da função, na mesma ordem em toda renderização."},
+{topic:"useState", q:"O que a função set (ex: setContador) faz ao ser chamada?", opts:["Apenas grava o valor, sem avisar o React","Guarda o novo valor e avisa o React para re-renderizar o componente","Executa um fetch automaticamente","Remove o componente da tela"], correct:1, explain:"A função set faz duas coisas: guarda o novo valor e avisa o React, que roda o componente de novo."},
+{topic:"Funções", q:"Qual a diferença entre parâmetro e argumento?", opts:["São a mesma coisa","Parâmetro é definido na declaração da função; argumento é o valor enviado na chamada","Parâmetro só existe em arrow functions","Argumento é sempre um objeto"], correct:1, explain:"function somar(a,b) — a e b são parâmetros; somar(3,5) — 3 e 5 são argumentos."},
+{topic:"Funções", q:"Qual tipo de função permite hoisting (ser chamada antes de aparecer no arquivo)?", opts:["Arrow function","Expressão de função","Declaração de função (function nome(){})","Função assíncrona anônima"], correct:2, explain:"A declaração de função (function nome(){}) é a única forma que permite hoisting."},
+{topic:"Funções", q:"Em qual caso uma arrow function tem retorno implícito?", opts:["Sempre que usa parênteses nos parâmetros","Quando não usa chaves { } no corpo","Somente dentro de componentes React","Quando é declarada com function"], correct:1, explain:"Sem chaves, a própria expressão é o retorno; com chaves, o return precisa ser explícito."},
+{topic:"Funções", q:"O que await faz dentro de uma função async?", opts:["Cancela a função","Pausa a execução daquela linha até a Promise ser resolvida","Transforma a função em callback","Impede o uso de try/catch"], correct:1, explain:"await pausa a linha até o valor da Promise chegar, sem travar o resto do programa."},
+{topic:"Callback", q:"O que é um callback?", opts:["Uma função que sempre retorna outra função","Uma função passada como argumento para outra função executar depois","Um tipo de estado do React","Um método de CSS"], correct:1, explain:"Callback é a função entregue como argumento para outra função chamar de volta."},
+{topic:"Callback", q:"Qual a diferença entre onClick={avisar} e onClick={avisar()}?", opts:["Não há diferença","O primeiro executa só no clique; o segundo executa imediatamente ao renderizar","O segundo é mais rápido","O primeiro só funciona com useState"], correct:1, explain:"Com parênteses a função roda na hora do render, não no clique — erro clássico."},
+{topic:"Callback", q:"Para passar um argumento a uma função em um evento onClick, a forma correta é:", opts:["onClick={funcao(arg)}","onClick={() => funcao(arg)}","onClick=\"funcao(arg)\"","onClick={funcao => arg}"], correct:1, explain:"Envolver em uma arrow function garante que a chamada só aconteça no clique."},
+{topic:"Métodos de vetor", q:"Qual método NÃO devolve um novo vetor?", opts:["map","filter","reduce","Nenhum, todos devolvem vetor"], correct:2, explain:"reduce devolve um único valor acumulado, não um vetor."},
+{topic:"Métodos de vetor", q:"Qual método transforma cada item de um vetor em algo novo, mantendo o mesmo tamanho?", opts:["forEach","map","filter","reduce"], correct:1, explain:"map troca o padrão 'vetor auxiliar + push' pelo retorno do próprio callback, item a item."},
+{topic:"Métodos de vetor", q:"Qual método seleciona itens de um vetor com base em uma condição (true/false)?", opts:["map","filter","forEach","reduce"], correct:1, explain:"filter usa o retorno booleano do callback como um if: true entra, false fica de fora."},
+{topic:"Métodos de vetor", q:"No React, qual método é usado para renderizar listas dentro do JSX?", opts:["forEach, porque devolve os elementos","map, porque devolve um vetor que pode ser inserido no JSX","filter, sempre combinado com reduce","reduce, porque acumula o JSX"], correct:1, explain:"map devolve um vetor de elementos JSX, que o React consegue renderizar diretamente."},
+{topic:"Métodos de vetor", q:"Qual prop especial deve ser usada ao renderizar uma lista com map no React?", opts:["id","key","index","ref"], correct:1, explain:"key identifica cada item para o React atualizar a lista com eficiência; use um valor único e estável."},
+{topic:"Métodos de vetor", q:"O que o callback do reduce recebe como primeiro parâmetro?", opts:["O item atual apenas","O acumulador (acc)","O índice do vetor","O vetor original"], correct:1, explain:"O reduce passa (acc, item) — acc é o acumulado até aquela volta."},
+{topic:"Desestruturação", q:"Na desestruturação de objeto, os valores são extraídos por:", opts:["Posição","Nome da propriedade","Ordem alfabética","Tipo de dado"], correct:1, explain:"const { nome, curso } = aluno extrai pelo nome da chave, em qualquer ordem."},
+{topic:"Desestruturação", q:"Na desestruturação de vetor (ex: useState), os valores são extraídos por:", opts:["Nome da propriedade","Posição (índice)","Tipo de dado","Ordem alfabética"], correct:1, explain:"Vetores não têm nome de propriedade, então a ordem (índice) define quem é quem."},
+{topic:"Desestruturação", q:"Como renomear uma propriedade durante a desestruturação de objeto?", opts:["const { titulo: novoNome } = produto","const { titulo -> novoNome } = produto","const { titulo as novoNome } = produto","Não é possível renomear"], correct:0, explain:"A sintaxe { propriedade: novoNome } renomeia a variável criada."},
+{topic:"Desestruturação", q:"Em const [a, b, c, d = 0] = notas, se notas tiver só 3 posições, o que acontece com d?", opts:["Gera erro de sintaxe","d recebe o valor padrão 0","d vira undefined obrigatoriamente","O array notas é alterado"], correct:1, explain:"Quando a posição não existe, o valor padrão definido é usado."},
+{topic:"Ternário", q:"O operador ternário é composto por quantas partes?", opts:["Duas","Três: condição, valor se true, valor se false","Quatro","Uma"], correct:1, explain:"condição ? seTrue : seFalse — três partes, por isso 'ternário'."},
+{topic:"Ternário", q:"Qual a principal diferença entre if/else e o operador ternário?", opts:["O ternário não pode ser usado dentro de funções","O if/else é uma expressão; o ternário é uma instrução","O ternário é uma expressão que devolve um valor e funciona dentro do JSX","Não há diferença de comportamento"], correct:2, explain:"O ternário devolve um valor (expressão); por isso funciona entre as chaves do JSX, e o if/else não."},
+{topic:"Ternário", q:"Dentro do JSX, {logado ? <Sair/> : <Entrar/>} é um exemplo de:", opts:["Callback","Renderização condicional","Desestruturação","CSS Module"], correct:1, explain:"O ternário escolhe entre dois blocos de JSX conforme o estado — renderização condicional."},
+{topic:"Operadores lógicos", q:"O que o operador || retorna?", opts:["Sempre um booleano (true/false)","O primeiro valor truthy encontrado (ou o último, se todos forem falsy)","Sempre o segundo operando","Um array com os dois valores"], correct:1, explain:"|| para no primeiro truthy e o devolve; se todos forem falsy, devolve o último."},
+{topic:"Operadores lógicos", q:"Qual desses valores é considerado falsy em JavaScript?", opts:['"0" (string)',"[] (array vazio)","0 (número zero)","{} (objeto vazio)"], correct:2, explain:"O número 0 é falsy. String '0', array [] e objeto {} vazios são todos truthy."},
+{topic:"Operadores lógicos", q:"No JSX, {condicao && <Componente />} serve para:", opts:["Sempre renderizar o componente","Renderizar o componente somente quando a condição for truthy","Renderizar dois componentes ao mesmo tempo","Substituir o useState"], correct:1, explain:"&& mostra o componente sob demanda: se a condição for falsy, nada é renderizado."},
+{topic:"Operadores lógicos", q:'Por que é arriscado usar {curtidas || "-"} quando curtidas pode ser 0?', opts:["Porque 0 gera erro de sintaxe","Porque 0 é falsy e o fallback aparece mesmo sendo um valor válido","Porque o || não aceita números","Não há risco nenhum"], correct:1, explain:"0 é falsy, então o || trocaria um valor legítimo (zero curtidas) pelo fallback '-'."},
+{topic:"Promises/fetch", q:"Quais são os três estados possíveis de uma Promise?", opts:["start, loading, end","pending, fulfilled, rejected","open, close, error","init, run, done"], correct:1, explain:"pending (em andamento), fulfilled (sucesso) e rejected (falha)."},
+{topic:"Promises/fetch", q:"O que acontece se você esquecer o await antes de resposta.json()?", opts:["O código quebra imediatamente","Você recebe uma Promise pendente, não os dados já convertidos","O fetch é cancelado","O React re-renderiza automaticamente"], correct:1, explain:"resposta.json() também é assíncrono; sem await, o retorno é a própria Promise, não os dados."},
+{topic:"Promises/fetch", q:"Qual bloco é usado para tratar erros em código com async/await?", opts:["then/catch","try/catch","if/else","switch/case"], correct:1, explain:"try/catch é o padrão de tratamento de erro combinado com await."},
+{topic:"Eventos/inputs", q:'O que caracteriza um "campo de entrada controlado" no React?', opts:["O navegador controla o valor sozinho","O valor do input vem do estado, atualizado a cada onChange","O campo não pode receber onChange","O campo é somente leitura"], correct:1, explain:"No padrão controlado, quem decide o texto exibido é o estado, via value + onChange."},
+{topic:"Eventos/inputs", q:"No evento onChange={(e) => setNome(e.target.value)}, o que é e.target.value?", opts:["O nome do componente","O texto digitado até aquele instante no campo","O tipo do evento","O id do input"], correct:1, explain:"e.target é o elemento que disparou o evento; .value é o texto atual dele."},
+{topic:"Fetch POST", q:"Por que é necessário usar JSON.stringify() no body de uma requisição POST?", opts:["Porque o fetch só aceita arrays","Porque o corpo da requisição HTTP precisa ser texto, e um objeto JS não viaja sozinho pela rede","Porque o servidor só entende XML","Porque acelera a requisição"], correct:1, explain:"JSON.stringify serializa o objeto em texto para que ele possa atravessar a rede."},
+];
+
+const quizList = document.getElementById('quizList');
+const state = new Array(QUESTIONS.length).fill(null);
+
+QUESTIONS.forEach((item, qi)=>{
+  const card = document.createElement('div');
+  card.className = 'qcard';
+  card.id = 'q'+qi;
+
+  const meta = document.createElement('div');
+  meta.className = 'qmeta';
+  meta.innerHTML = `<span class="qnum">Questão ${qi+1}/${QUESTIONS.length}</span><span class="qtopic">${item.topic}</span>`;
+  card.appendChild(meta);
+
+  const qtext = document.createElement('div');
+  qtext.className = 'qtext';
+  qtext.textContent = item.q;
+  card.appendChild(qtext);
+
+  const ul = document.createElement('ul');
+  ul.className = 'options';
+  item.opts.forEach((opt, oi)=>{
+    const li = document.createElement('li');
+    li.className = 'option';
+    li.dataset.index = oi;
+    li.innerHTML = `<input type="radio" name="q${qi}" ${false}><span>${opt}</span>`;
+    li.addEventListener('click', ()=> answer(qi, oi));
+    ul.appendChild(li);
+  });
+  card.appendChild(ul);
+
+  const explain = document.createElement('div');
+  explain.className = 'explain';
+  explain.id = 'exp'+qi;
+  card.appendChild(explain);
+
+  quizList.appendChild(card);
+});
+
+function answer(qi, oi){
+  if(state[qi] !== null) return;
+  state[qi] = oi;
+  const card = document.getElementById('q'+qi);
+  card.classList.add('answered');
+  const opts = card.querySelectorAll('.option');
+  const correctIdx = QUESTIONS[qi].correct;
+  opts.forEach((el,i)=>{
+    el.querySelector('input').checked = (i===oi);
+    if(i===correctIdx) el.classList.add('correct');
+    else if(i===oi) el.classList.add('wrong');
+  });
+  const isCorrect = oi===correctIdx;
+  const exp = document.getElementById('exp'+qi);
+  exp.innerHTML = `<span class="verdict ${isCorrect?'ok':'no'}">${isCorrect?'Certo.':'Quase.'}</span>${QUESTIONS[qi].explain}`;
+  updateProgress();
+}
+
+function updateProgress(){
+  const answered = state.filter(v=>v!==null).length;
+  const correct = state.filter((v,i)=> v===QUESTIONS[i].correct).length;
+  document.getElementById('progressFill').style.width = (answered/QUESTIONS.length*100)+'%';
+  document.getElementById('progressLabel').textContent = `${answered} de ${QUESTIONS.length} respondidas`;
+  const pill = document.getElementById('scorePill');
+  if(answered>0){
+    pill.classList.add('show');
+    pill.textContent = `${correct}/${answered} certas`;
+  } else {
+    pill.classList.remove('show');
+  }
+  const banner = document.getElementById('resultsBanner');
+  if(answered===QUESTIONS.length){
+    banner.classList.add('show');
+    document.getElementById('resultsBig').textContent = `${correct} / ${QUESTIONS.length}`;
+    const pct = Math.round(correct/QUESTIONS.length*100);
+    let msg = 'Revise os tópicos que errou antes da prova.';
+    if(pct>=90) msg = 'Excelente domínio dos conteúdos da AC1!';
+    else if(pct>=70) msg = 'Bom resultado — repasse os pontos que ainda pegam.';
+    document.getElementById('resultsText').textContent = `Você acertou ${pct}% das questões. ${msg}`;
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  for(let i=0;i<state.length;i++) state[i]=null;
+  document.querySelectorAll('.qcard').forEach(card=>{
+    card.classList.remove('answered');
+    card.querySelectorAll('.option').forEach(o=>{o.classList.remove('correct','wrong'); o.querySelector('input').checked=false;});
+  });
+  updateProgress();
+  document.getElementById('quiz').scrollIntoView({behavior:'smooth'});
+});
+
+updateProgress();
+</script>
+</body>
+</html>
